@@ -2,42 +2,34 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"os"
-	"sync"
+	"time"
 )
 
 func main() {
 	file := open()
 	defer file.Close()
-
-	lines := make(chan string)
+	lines := process(file)
 	validate(lines)
-	process(file, lines)
-	defer close(lines)
 }
 
 func validate(lines <-chan string) {
 	go func() {
-		line := <-lines
-		fmt.Println(line)
+		// line := <-lines
+		// fmt.Println(line)
 	}()
 }
 
-func process(file *os.File, lines chan<- string) {
+func process(file *os.File) <-chan string {
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
-	var wg sync.WaitGroup
+	lines := make(chan string)
+	defer close(lines)
 	for scanner.Scan() {
 		data := scanner.Text()
-		wg.Add(1)
-		go func(data string) {
-			// fmt.Println(data)
-			lines <- data
-			wg.Done()
-		}(data)
+		lines <- data
 	}
-	wg.Wait()
+	return lines
 }
 
 func open() *os.File {
@@ -47,3 +39,19 @@ func open() *os.File {
 	}
 	return file
 }
+
+type order struct {
+	id      string
+	value   float32
+	express bool
+	date    time.Time
+}
+
+// func parse(line string) order {
+// 	values := strings.Split(line, ",")
+// 	var order order
+// 	order.id = values[0]
+// 	order.value = strconv.ParseFloat(values[1])
+// 	order.express = values[2]
+// 	order.date = values[3]
+// }
