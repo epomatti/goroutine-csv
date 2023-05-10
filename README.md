@@ -7,3 +7,4 @@ Requirements:
 - Goroutines should stop if a CSV line is invalid
 
 https://gobyexample.com/goroutines
+https://stackoverflow.com/questions/30183669/passing-parameters-to-function-closure
